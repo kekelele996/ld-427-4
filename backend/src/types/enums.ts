@@ -35,3 +35,9 @@ export enum BudgetCategory {
   Contingency = 'Contingency',
   Other = 'Other',
 }
+
+export enum BudgetChangeStatus {
+  Pending = 'Pending',
+  Approved = 'Approved',
+  Rejected = 'Rejected',
+}

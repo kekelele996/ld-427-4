@@ -5,6 +5,7 @@ from budget_app.models import Role
 
 WRITE_ROLES = {Role.ADMIN, Role.FINANCE_MANAGER, Role.PROJECT_MANAGER, Role.ACCOUNTANT}
 APPROVAL_ROLES = {Role.ADMIN, Role.FINANCE_MANAGER, Role.PROJECT_MANAGER}
+FINANCE_APPROVAL_ROLES = {Role.ADMIN, Role.FINANCE_MANAGER}
 
 
 def user_role(user) -> str:
@@ -22,6 +23,8 @@ class BudgetRBACPermission(BasePermission):
             return True
         if getattr(view, "approval_action", False):
             return role in APPROVAL_ROLES
+        if getattr(view, "finance_approval_action", False):
+            return role in FINANCE_APPROVAL_ROLES
         if getattr(view, "accounting_action", False):
             return role in {Role.ADMIN, Role.FINANCE_MANAGER, Role.ACCOUNTANT}
         return role in WRITE_ROLES

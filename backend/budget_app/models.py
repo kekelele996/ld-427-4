@@ -181,6 +181,42 @@ class Reconciliation(TimestampedModel):
         super().save(*args, **kwargs)
 
 
+class BudgetChangeStatus(models.TextChoices):
+    PENDING = "Pending", "待审批"
+    APPROVED = "Approved", "已通过"
+    REJECTED = "Rejected", "已驳回"
+
+
+class BudgetChangeRequest(TimestampedModel):
+    budget_sheet = models.ForeignKey(BudgetSheet, on_delete=models.CASCADE, related_name="change_requests")
+    reason = models.TextField()
+    total_amount_before = models.DecimalField(max_digits=14, decimal_places=2)
+    total_amount_after = models.DecimalField(max_digits=14, decimal_places=2)
+    status = models.CharField(max_length=16, choices=BudgetChangeStatus.choices, default=BudgetChangeStatus.PENDING)
+    applicant_id = models.CharField(max_length=64)
+    approver_id = models.CharField(max_length=64, blank=True, default="")
+    approval_comment = models.TextField(blank=True, default="")
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        return f"{self.budget_sheet_id}:{self.status}"
+
+
+class BudgetChangeRequestItem(TimestampedModel):
+    change_request = models.ForeignKey(BudgetChangeRequest, on_delete=models.CASCADE, related_name="item_changes")
+    budget_item = models.ForeignKey(BudgetItem, on_delete=models.CASCADE, related_name="change_requests")
+    original_amount = models.DecimalField(max_digits=14, decimal_places=2)
+    requested_amount = models.DecimalField(max_digits=14, decimal_places=2)
+
+    class Meta:
+        unique_together = [("change_request", "budget_item")]
+
+    def __str__(self) -> str:
+        return f"{self.change_request_id}:{self.budget_item_id}"
+
+
 class AuditLog(TimestampedModel):
     actor_id = models.CharField(max_length=64, blank=True, default="")
     action = models.CharField(max_length=80)

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from budget_app.models import AuditLog, BudgetItem, BudgetSheet, ExpenseRecord, Reconciliation, Supplier, UserRole
+from budget_app.models import AuditLog, BudgetChangeRequest, BudgetChangeRequestItem, BudgetItem, BudgetSheet, ExpenseRecord, Reconciliation, Supplier, UserRole
 
 
 @admin.register(BudgetSheet)
@@ -41,3 +41,14 @@ class AuditLogAdmin(admin.ModelAdmin):
 
 
 admin.site.register(UserRole)
+
+
+@admin.register(BudgetChangeRequest)
+class BudgetChangeRequestAdmin(admin.ModelAdmin):
+    list_display = ("id", "budget_sheet", "total_amount_before", "total_amount_after", "status", "applicant_id", "created_at")
+    list_filter = ("status",)
+
+
+@admin.register(BudgetChangeRequestItem)
+class BudgetChangeRequestItemAdmin(admin.ModelAdmin):
+    list_display = ("id", "change_request", "budget_item", "original_amount", "requested_amount")
